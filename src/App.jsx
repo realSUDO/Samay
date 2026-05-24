@@ -148,7 +148,7 @@ function updateDialSoundFromMovement(currentAngle, tracker, now = performance.no
 
 // ── App ────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [rotation, setRotation] = useState(0)
+  const [rotation, setRotation] = useState(STEP)
   const [isDragging, setIsDragging] = useState(false)
 
   // drag state — all in a ref to avoid stale closures
