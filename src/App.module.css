@@ -31,11 +31,25 @@
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 17px;
+  font-size: 22px;
   letter-spacing: 0.28em;
-  color: var(--text-muted);
+  color: rgba(240,240,240,0.48);
   user-select: none;
+  text-shadow: 0 0 18px rgba(124,106,247,0.08);
+}
+
+.brand::after {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.55;
+  box-shadow: 0 0 14px var(--accent-glow);
 }
 
 .main {
