@@ -67,7 +67,7 @@ function getDialGeometry(width = 1024) {
     const radius = clamp(width * 0.42, 135, 168)
     return {
       radius,
-      below: radius - 88,
+      below: radius - 132,
     }
   }
 

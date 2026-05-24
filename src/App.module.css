@@ -204,8 +204,13 @@
 }
 
 @media (max-width: 600px) {
-  .shell { --dial-safe-area: 140px; }
+  .shell { --dial-safe-area: 170px; }
   .main { padding-top: 48px; }
+  .arcZone { height: 190px; }
+  .arcTrack {
+    bottom: 34px;
+    height: 170px;
+  }
   .arcBtn {
     width: 48px;
     height: 48px;
