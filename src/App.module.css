@@ -206,6 +206,19 @@
 @media (max-width: 600px) {
   .shell { --dial-safe-area: 140px; }
   .main { padding-top: 48px; }
+  .arcBtn {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+    justify-content: center;
+    gap: 0;
+  }
+  .arcLabel { display: none; }
+  .arcIcon svg {
+    width: 17px;
+    height: 17px;
+  }
 }
 
 @media (max-height: 740px) {

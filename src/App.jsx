@@ -56,17 +56,40 @@ const TABS        = [
   { id: 'stopwatch', label: 'Stopwatch', icon: StopwatchIcon },
   { id: 'timer',     label: 'Timer',     icon: TimerIcon },
 ]
-const DISK_R      = 500
-const DISK_BELOW  = 380
+const DESKTOP_DISK_R = 500
+const DESKTOP_DISK_BELOW = 380
 const STEP        = 28
 const BASE_ANGLES = [-118, -90, -62]
 const RETURN_ANIMATION_MS = 430
 
-function tabPos(tabIdx, rotation) {
+function getDialGeometry(width = 1024) {
+  if (width <= 600) {
+    const radius = clamp(width * 0.42, 135, 168)
+    return {
+      radius,
+      below: radius - 88,
+    }
+  }
+
+  if (width <= 820) {
+    const radius = clamp(width * 0.52, 330, DESKTOP_DISK_R)
+    return {
+      radius,
+      below: radius - 110,
+    }
+  }
+
+  return {
+    radius: DESKTOP_DISK_R,
+    below: DESKTOP_DISK_BELOW,
+  }
+}
+
+function tabPos(tabIdx, rotation, geometry) {
   const rad = (BASE_ANGLES[tabIdx] + rotation) * Math.PI / 180
   return {
-    left: `calc(50% + ${(DISK_R * Math.cos(rad)).toFixed(2)}px)`,
-    top:  `calc(100% + ${(DISK_BELOW + DISK_R * Math.sin(rad)).toFixed(2)}px)`,
+    left: `calc(50% + ${(geometry.radius * Math.cos(rad)).toFixed(2)}px)`,
+    top:  `calc(100% + ${(geometry.below + geometry.radius * Math.sin(rad)).toFixed(2)}px)`,
   }
 }
 
@@ -150,6 +173,9 @@ function updateDialSoundFromMovement(currentAngle, tracker, now = performance.no
 export default function App() {
   const [rotation, setRotation] = useState(STEP)
   const [isDragging, setIsDragging] = useState(false)
+  const [dialGeometry, setDialGeometry] = useState(() => getDialGeometry(
+    typeof window === 'undefined' ? 1024 : window.innerWidth,
+  ))
 
   // drag state — all in a ref to avoid stale closures
   const drag = useRef({
@@ -164,6 +190,13 @@ export default function App() {
 
   const activeIdx = activeFromRot(rotation)
   const activeId  = TABS[activeIdx].id
+
+  useEffect(() => {
+    const updateGeometry = () => setDialGeometry(getDialGeometry(window.innerWidth))
+    updateGeometry()
+    window.addEventListener('resize', updateGeometry)
+    return () => window.removeEventListener('resize', updateGeometry)
+  }, [])
 
   useEffect(() => {
     rotationRef.current = rotation
@@ -213,14 +246,14 @@ export default function App() {
     const dx = e.clientX - drag.current.startX
     if (Math.abs(dx) > 3) drag.current.moved = true
 
-    const deltaRot = (dx / DISK_R) * (180 / Math.PI)
+    const deltaRot = (dx / dialGeometry.radius) * (180 / Math.PI)
     const raw = drag.current.startRot + deltaRot
     const clamped = Math.max(-STEP * 1.4, Math.min(STEP * 2.4, raw))
 
     updateDialSoundFromMovement(clamped, drag.current.sound)
     rotationRef.current = clamped
     setRotation(clamped)
-  }, [])
+  }, [dialGeometry.radius])
 
   // ── Pointer up — snap back with movement-driven return ticks ──
   const onPointerUp = useCallback((e, tabIdx) => {
@@ -283,11 +316,11 @@ export default function App() {
         aria-hidden="true"
       />
 
-      <ArcTrack rotation={rotation} />
+      <ArcTrack rotation={rotation} geometry={dialGeometry} />
 
       <nav className={styles.arcNav} aria-label="Mode">
         {TABS.map((tab, i) => {
-          const pos = tabPos(i, rotation)
+          const pos = tabPos(i, rotation, dialGeometry)
           const isActive = i === activeIdx
           return (
             <button
@@ -310,17 +343,20 @@ export default function App() {
   )
 }
 
-function ArcTrack({ rotation }) {
+function ArcTrack({ rotation, geometry }) {
   const svgW = 900, svgH = 200
   const cx = svgW / 2
-  const cy = svgH + DISK_BELOW
+  const scale = DESKTOP_DISK_R / geometry.radius
+  const radius = geometry.radius * scale
+  const below = geometry.below * scale
+  const cy = svgH + below
 
   const pts = BASE_ANGLES.map(base => {
     const rad = (base + rotation) * Math.PI / 180
-    return { x: cx + DISK_R * Math.cos(rad), y: cy + DISK_R * Math.sin(rad) }
+    return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) }
   })
   const [p0, p1, p2] = pts
-  const d = `M ${p0.x.toFixed(1)} ${p0.y.toFixed(1)} A ${DISK_R} ${DISK_R} 0 0 1 ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`
+  const d = `M ${p0.x.toFixed(1)} ${p0.y.toFixed(1)} A ${radius} ${radius} 0 0 1 ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`
 
   return (
     <svg className={styles.arcTrack} viewBox={`0 0 ${svgW} ${svgH}`} preserveAspectRatio="xMidYMax meet" aria-hidden="true">
