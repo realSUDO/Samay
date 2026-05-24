@@ -90,11 +90,13 @@ export default function Clock() {
       {/* Main local clock */}
       <div className={styles.mainClock}>
         <div className={styles.timeRow}>
-          <span className={styles.time}>{h}:{m}</span>
-          <div className={styles.timeSuffix}>
+          <span className={styles.timeHours}>{h}</span>
+          <span className={styles.timeColon}>:</span>
+          <span className={styles.timeMinutes}>{m}</span>
+          <span className={styles.timeSeconds}>
             <span className={styles.seconds}>{s}</span>
             {!use24h && <span className={styles.ampm}>{ampm}</span>}
-          </div>
+          </span>
         </div>
         <div className={styles.meta}>
           <span className={styles.date}>{date}</span>

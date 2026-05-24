@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import TimeDisplay from './TimeDisplay'
 import Controls from './Controls'
 import styles from './Stopwatch.module.css'
 
@@ -9,44 +8,44 @@ function playClick() {
   a.play().catch(() => {})
 }
 
-function fmtMs(ms) {
-  const totalCs = Math.floor(ms / 10)
-  const cs = totalCs % 100
-  const totalSec = Math.floor(ms / 1000)
-  const s = totalSec % 60
-  const m = Math.floor(totalSec / 60) % 60
-  const h = Math.floor(totalSec / 3600)
-  const base = h > 0
-    ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-  return `${base}.${String(cs).padStart(2,'0')}`
+function pad(n, len = 2) { return String(n).padStart(len, '0') }
+
+function fmtSplit(ms) {
+  const cs  = Math.floor(ms / 10) % 100
+  const s   = Math.floor(ms / 1000) % 60
+  const m   = Math.floor(ms / 60000) % 60
+  const h   = Math.floor(ms / 3600000)
+  return h > 0
+    ? `${pad(h)}:${pad(m)}:${pad(s)}.${pad(cs)}`
+    : `${pad(m)}:${pad(s)}.${pad(cs)}`
 }
 
 export default function Stopwatch() {
   const [elapsed, setElapsed] = useState(0)
   const [running, setRunning] = useState(false)
-  const [laps, setLaps] = useState([])
+  const [laps, setLaps]       = useState([])
 
   const startRef    = useRef(null)
   const baseRef     = useRef(0)
   const elapsedRef  = useRef(0)
-  const intervalRef = useRef(null)
+  const rafRef      = useRef(null)
 
-  useEffect(() => { elapsedRef.current = elapsed }, [elapsed])
-
+  // Use rAF for smooth centisecond updates instead of setInterval
   useEffect(() => {
     if (running) {
       startRef.current = Date.now()
-      intervalRef.current = setInterval(() => {
+      const tick = () => {
         const next = baseRef.current + (Date.now() - startRef.current)
         elapsedRef.current = next
         setElapsed(next)
-      }, 30)
+        rafRef.current = requestAnimationFrame(tick)
+      }
+      rafRef.current = requestAnimationFrame(tick)
     } else {
-      clearInterval(intervalRef.current)
+      cancelAnimationFrame(rafRef.current)
       baseRef.current = elapsedRef.current
     }
-    return () => clearInterval(intervalRef.current)
+    return () => cancelAnimationFrame(rafRef.current)
   }, [running])
 
   const handlePlayPause = () => {
@@ -56,22 +55,20 @@ export default function Stopwatch() {
 
   const handleReset = () => {
     setRunning(false)
+    cancelAnimationFrame(rafRef.current)
     setElapsed(0)
     setLaps([])
     elapsedRef.current = 0
     baseRef.current = 0
   }
 
-  const handleLap = () => {
-    setLaps(prev => [...prev, elapsedRef.current])
-  }
+  const handleLap = () => setLaps(prev => [...prev, elapsedRef.current])
 
-  const totalCs  = Math.floor(elapsed / 10)
-  const cs       = totalCs % 100
-  const totalSec = Math.floor(elapsed / 1000)
-  const hours    = Math.floor(totalSec / 3600)
-  const minutes  = Math.floor((totalSec % 3600) / 60)
-  const seconds  = totalSec % 60
+  // Derive display values
+  const cs  = Math.floor(elapsed / 10) % 100
+  const s   = Math.floor(elapsed / 1000) % 60
+  const m   = Math.floor(elapsed / 60000) % 60
+  const h   = Math.floor(elapsed / 3600000)
 
   // Lap analysis
   const lapTimes = laps.map((abs, i) => abs - (laps[i - 1] ?? 0))
@@ -80,14 +77,14 @@ export default function Stopwatch() {
 
   return (
     <div className={styles.wrapper}>
-      <TimeDisplay
-        hours={hours}
-        minutes={minutes}
-        seconds={seconds}
-        centiseconds={cs}
-        showHours={hours > 0}
-        showCentiseconds
-      />
+      {/* Plain text time display */}
+      <div className={styles.timeDisplay} role="timer" aria-live="off">
+        {h > 0 && <span className={styles.seg}>{pad(h)}<span className={styles.sep}>:</span></span>}
+        <span className={styles.seg}>{pad(m)}<span className={styles.sep}>:</span></span>
+        <span className={styles.seg}>{pad(s)}</span>
+        <span className={styles.cs}><span className={styles.csDot}>.</span>{pad(cs)}</span>
+      </div>
+
       <Controls
         running={running}
         onPlayPause={handlePlayPause}
@@ -95,12 +92,11 @@ export default function Stopwatch() {
         onLap={handleLap}
         showLap
       />
+
       {laps.length > 0 && (
         <div className={styles.lapsWrap}>
           <div className={styles.lapsHeader}>
-            <span>Lap</span>
-            <span>Split</span>
-            <span>Total</span>
+            <span>Lap</span><span>Split</span><span>Total</span>
           </div>
           <ol className={styles.laps} aria-label="Lap times">
             {[...laps].reverse().map((abs, ri) => {
@@ -109,17 +105,14 @@ export default function Stopwatch() {
               const isBest  = i === bestIdx
               const isWorst = i === worstIdx
               return (
-                <li
-                  key={i}
-                  className={`${styles.lap} ${isBest ? styles.best : ''} ${isWorst ? styles.worst : ''}`}
-                >
+                <li key={i} className={`${styles.lap} ${isBest ? styles.best : ''} ${isWorst ? styles.worst : ''}`}>
                   <span className={styles.lapNum}>
                     {isBest  && <span className={styles.badge} style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>best</span>}
-                    {isWorst && <span className={styles.badge} style={{ background: 'var(--red-dim)', color: 'var(--red)' }}>slow</span>}
+                    {isWorst && <span className={styles.badge} style={{ background: 'var(--red-dim)',   color: 'var(--red)'   }}>slow</span>}
                     {i + 1}
                   </span>
-                  <span className={styles.lapSplit}>{fmtMs(split)}</span>
-                  <span className={styles.lapTotal}>{fmtMs(abs)}</span>
+                  <span className={styles.lapSplit}>{fmtSplit(split)}</span>
+                  <span className={styles.lapTotal}>{fmtSplit(abs)}</span>
                 </li>
               )
             })}

@@ -41,10 +41,12 @@ function validate(raw) {
 export default function Timer() {
   const [totalSec, setTotalSec]   = useState(DEFAULT)
   const [remaining, setRemaining] = useState(DEFAULT)
+  const [displayRemaining, setDisplayRemaining] = useState(DEFAULT)
   const [running, setRunning]     = useState(false)
   const [editing, setEditing]     = useState(false)
   const [inputVal, setInputVal]   = useState(toInputVal(DEFAULT))
   const [finished, setFinished]   = useState(false)
+  const [lofiMuted, setLofiMuted] = useState(true)
 
   const startRef     = useRef(null)
   const baseRef      = useRef(DEFAULT)
@@ -53,12 +55,21 @@ export default function Timer() {
   const startedRef   = useRef(false)
   const lofiRef      = useRef(null)
   const beepRef      = useRef(null)
+  const timeUpRef    = useRef(null)
 
   useEffect(() => {
     lofiRef.current = Object.assign(new Audio('/lofi.mp3'), { loop: true })
     beepRef.current = new Audio('/beep.mp3')
-    return () => lofiRef.current?.pause()
+    timeUpRef.current = Object.assign(new Audio('/time-up.mp3'), { loop: true })
+    return () => {
+      lofiRef.current?.pause()
+      timeUpRef.current?.pause()
+    }
   }, [])
+
+  useEffect(() => {
+    if (lofiRef.current) lofiRef.current.muted = lofiMuted
+  }, [lofiMuted])
 
   useEffect(() => { remainRef.current = remaining }, [remaining])
 
@@ -66,18 +77,23 @@ export default function Timer() {
     if (running) {
       startRef.current = Date.now()
       intervalRef.current = setInterval(() => {
-        const left = Math.max(0, baseRef.current - Math.floor((Date.now() - startRef.current) / 1000))
-        remainRef.current = left
-        setRemaining(left)
-        if (left === 0) setRunning(false)
-      }, 250)
+        const leftExact = Math.max(0, baseRef.current - ((Date.now() - startRef.current) / 1000))
+        const leftWhole = Math.ceil(leftExact)
+        remainRef.current = leftWhole
+        setDisplayRemaining(leftExact)
+        setRemaining(leftWhole)
+        if (leftExact === 0) setRunning(false)
+      }, 50)
     } else {
       clearInterval(intervalRef.current)
       baseRef.current = remainRef.current
       if (remainRef.current === 0) {
         lofiRef.current?.pause()
         if (lofiRef.current) lofiRef.current.currentTime = 0
-        beepRef.current?.play().catch(() => {})
+        if (timeUpRef.current) {
+          timeUpRef.current.currentTime = 0
+          timeUpRef.current.play().catch(() => {})
+        }
         setFinished(true)
       } else {
         lofiRef.current?.pause()
@@ -85,6 +101,12 @@ export default function Timer() {
     }
     return () => clearInterval(intervalRef.current)
   }, [running])
+
+  const stopTimeUpAlarm = () => {
+    if (!timeUpRef.current) return
+    timeUpRef.current.pause()
+    timeUpRef.current.currentTime = 0
+  }
 
   const handlePlayPause = () => {
     if (remainRef.current === 0) return
@@ -97,18 +119,25 @@ export default function Timer() {
     setRunning(true)
   }
 
+  const handleToggleLofiMute = () => {
+    setLofiMuted(v => !v)
+  }
+
   const handleReset = () => {
+    stopTimeUpAlarm()
     lofiRef.current?.pause()
     if (lofiRef.current) lofiRef.current.currentTime = 0
     startedRef.current = false
     setRunning(false)
     setFinished(false)
     setRemaining(totalSec)
+    setDisplayRemaining(totalSec)
     remainRef.current = totalSec
     baseRef.current = totalSec
   }
 
   const applyPreset = (sec) => {
+    stopTimeUpAlarm()
     lofiRef.current?.pause()
     if (lofiRef.current) lofiRef.current.currentTime = 0
     startedRef.current = false
@@ -116,9 +145,20 @@ export default function Timer() {
     setFinished(false)
     setTotalSec(sec)
     setRemaining(sec)
+    setDisplayRemaining(sec)
     remainRef.current = sec
     baseRef.current = sec
     setInputVal(toInputVal(sec))
+  }
+
+  const handleAcknowledgeFinished = () => {
+    stopTimeUpAlarm()
+    setFinished(false)
+  }
+
+  const handleEditRequest = () => {
+    if (finished) handleAcknowledgeFinished()
+    setEditing(true)
   }
 
   const commitInput = (raw) => {
@@ -129,7 +169,7 @@ export default function Timer() {
     return true
   }
 
-  const progress = totalSec > 0 ? remaining / totalSec : 1
+  const progress = totalSec > 0 ? displayRemaining / totalSec : 1
   const dashOffset = RING_C * (1 - progress)
 
   const hours   = Math.floor(remaining / 3600)
@@ -173,7 +213,7 @@ export default function Timer() {
             strokeDasharray={RING_C}
             strokeDashoffset={dashOffset}
             transform="rotate(-90 180 180)"
-            style={{ transition: running ? 'stroke-dashoffset 0.25s linear' : 'none' }}
+            style={{ transition: running ? 'stroke-dashoffset 0.08s linear, stroke 0.6s ease' : 'stroke 0.6s ease' }}
           />
         </svg>
 
@@ -187,7 +227,7 @@ export default function Timer() {
         ) : (
           <button
             className={`${styles.displayBtn} ${!running ? styles.clickable : ''} ${finished ? styles.finished : ''}`}
-            onClick={() => !running && setEditing(true)}
+            onClick={() => !running && handleEditRequest()}
             disabled={running}
             aria-label="Set timer duration"
           >
@@ -197,7 +237,14 @@ export default function Timer() {
         )}
       </div>
 
-      {finished && <p className={styles.finishedMsg}>Time&apos;s up!</p>}
+      {finished && (
+        <div className={styles.finishedBox}>
+          <p className={styles.finishedMsg}>Time&apos;s up!</p>
+          <button className={styles.okayBtn} onClick={handleAcknowledgeFinished}>
+            OK
+          </button>
+        </div>
+      )}
 
       {!editing && (
         <Controls
@@ -205,6 +252,12 @@ export default function Timer() {
           onPlayPause={handlePlayPause}
           onReset={handleReset}
           showLap={false}
+          rightAction={running ? {
+            onClick: handleToggleLofiMute,
+            ariaLabel: lofiMuted ? 'Unmute lofi' : 'Mute lofi',
+            active: lofiMuted,
+            icon: lofiMuted ? <VolumeOffIcon /> : <VolumeIcon />,
+          } : null}
         />
       )}
 
@@ -212,6 +265,26 @@ export default function Timer() {
         <p className={styles.hint}>Click the time to set a custom duration</p>
       )}
     </div>
+  )
+}
+
+function VolumeIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+      <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+    </svg>
+  )
+}
+
+function VolumeOffIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <line x1="16" y1="9" x2="22" y2="15" />
+      <line x1="22" y1="9" x2="16" y2="15" />
+    </svg>
   )
 }
 

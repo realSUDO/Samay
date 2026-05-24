@@ -43,6 +43,18 @@
   transform: none;
 }
 
+.secondaryActive {
+  color: var(--accent);
+  border-color: rgba(124,106,247,0.42);
+  background: var(--accent-dim);
+}
+
+.secondaryActive:hover {
+  color: var(--accent);
+  border-color: rgba(124,106,247,0.58);
+  background: var(--accent-dim);
+}
+
 .primary {
   width: clamp(60px, 7.5vw, 80px);
   height: clamp(60px, 7.5vw, 80px);
@@ -68,3 +80,20 @@
 }
 
 .ghost { visibility: hidden; pointer-events: none; }
+
+@media (max-height: 620px) {
+  .controls {
+    gap: clamp(14px, 4vw, 28px);
+    margin-top: 16px;
+  }
+
+  .secondary {
+    width: 40px;
+    height: 40px;
+  }
+
+  .primary {
+    width: 54px;
+    height: 54px;
+  }
+}

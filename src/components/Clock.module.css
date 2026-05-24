@@ -2,9 +2,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   width: 100%;
-  max-width: 640px;
+  max-width: 600px;
   padding: 0 32px;
 }
 
@@ -13,53 +13,77 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
 }
 
+/* Big time: HH:MM */
 .timeRow {
   display: flex;
-  align-items: flex-end;
-  gap: 14px;
-}
-
-.time {
+  align-items: center;
+  gap: 0;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(96px, 18vw, 200px);
-  line-height: 0.86;
-  color: var(--text);
+  font-size: clamp(88px, 16vw, 172px);
+  line-height: 0.9;
   letter-spacing: -0.01em;
   user-select: none;
 }
 
-.timeSuffix {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  padding-bottom: clamp(12px, 1.8vw, 22px);
+.timeHours {
+  color: var(--accent);
+  text-shadow: 0 0 60px var(--accent-glow);
+}
+
+.timeColon {
+  color: var(--text-muted);
+  opacity: 0.3;
+  margin: 0 4px;
+  /* blink every second */
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.08; }
+}
+
+.timeMinutes { color: var(--text); }
+
+/* Seconds + AM/PM — small side annotation after minutes */
+.timeSeconds {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: start;
+  align-content: center;
+  gap: 6px;
+  min-width: 0.36em;
+  color: var(--text-muted);
+  margin-left: 12px;
+  transform: translateY(-0.02em);
 }
 
 .seconds {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(32px, 5vw, 60px);
-  color: var(--text-muted);
-  line-height: 1;
-  user-select: none;
+  font-size: 0.28em;
+  line-height: 0.9;
+  letter-spacing: 0.03em;
 }
 
 .ampm {
-  font-size: 9px;
+  font-size: clamp(16px, 0.16em, 28px);
+  line-height: 1;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
+  opacity: 0.85;
+  font-family: 'Inter', sans-serif;
+  transform: translateY(-0.05em);
 }
 
-/* ── Meta ── */
+/* ── Meta row ── */
 .meta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -68,10 +92,9 @@
   font-size: 13px;
   font-weight: 400;
   color: var(--text-secondary);
-  letter-spacing: 0.01em;
 }
 
-.dot { color: var(--text-muted); font-size: 13px; }
+.dot { color: var(--text-muted); }
 
 .tz {
   font-size: 11px;
@@ -99,6 +122,33 @@
   border-color: var(--border-focus);
 }
 
+@media (max-height: 620px) {
+  .wrapper {
+    gap: 10px;
+    padding: 0 20px;
+  }
+
+  .mainClock {
+    gap: 10px;
+  }
+
+  .timeRow {
+    font-size: clamp(56px, 22vh, 104px);
+  }
+
+  .meta {
+    gap: 6px;
+  }
+
+  .date {
+    font-size: 11px;
+  }
+
+  .tz {
+    font-size: 9px;
+  }
+}
+
 /* ── World clock pins ── */
 .pins {
   display: flex;
@@ -118,23 +168,11 @@
   transition: border-color 0.15s, background 0.15s;
 }
 
-.pinCard:hover {
-  border-color: var(--border-mid);
-  background: var(--bg-hover);
-}
+.pinCard:hover { border-color: var(--border-mid); background: var(--bg-hover); }
 
-.pinLeft {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.pinLeft { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 
-.pinCity {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
+.pinCity { font-size: 13px; font-weight: 500; color: var(--text); }
 
 .pinTz {
   font-size: 10px;
@@ -143,11 +181,7 @@
   text-transform: uppercase;
 }
 
-.pinRight {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-}
+.pinRight { display: flex; align-items: baseline; gap: 4px; }
 
 .pinTime {
   font-family: 'Bebas Neue', sans-serif;
@@ -169,7 +203,6 @@
   color: var(--text-muted);
   padding: 4px;
   border-radius: 4px;
-  transition: color 0.15s, background 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,11 +211,7 @@
 }
 
 .pinCard:hover .pinRemove { opacity: 1; }
-
-.pinRemove:hover {
-  color: var(--red);
-  background: var(--red-dim);
-}
+.pinRemove:hover { color: var(--red); background: var(--red-dim); }
 
 /* ── Add zone ── */
 .addBtn {
@@ -241,12 +270,6 @@
 }
 
 .suggestion:hover { background: var(--bg-hover); }
-
 .suggCity { font-size: 13px; font-weight: 500; color: var(--text); }
 .suggTz   { font-size: 11px; color: var(--text-muted); }
-
-.noResults {
-  padding: 12px 14px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
+.noResults { padding: 12px 14px; font-size: 12px; color: var(--text-muted); }

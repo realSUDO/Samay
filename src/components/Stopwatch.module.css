@@ -7,21 +7,59 @@
   padding: 0 24px;
 }
 
+/* ── Plain text time display ── */
+.timeDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+  line-height: 1;
+}
+
+.seg {
+  font-size: clamp(72px, 13vw, 148px);
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.sep {
+  font-size: clamp(44px, 8vw, 90px);
+  color: var(--text-muted);
+  opacity: 0.3;
+  margin: 0 1px;
+}
+
+/* Centiseconds — smaller, baseline-aligned */
+.cs {
+  font-size: clamp(36px, 6vw, 68px);
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+  align-self: flex-end;
+  padding-bottom: clamp(6px, 1vw, 12px);
+}
+
+.csDot {
+  color: var(--text-muted);
+  opacity: 0.3;
+}
+
 /* ── Laps ── */
 .lapsWrap {
   width: 100%;
-  margin-top: 32px;
+  margin-top: 28px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
-  max-height: 240px;
+  max-height: 220px;
   overflow-y: auto;
 }
 
 .lapsHeader {
   display: grid;
-  grid-template-columns: 64px 1fr 1fr;
+  grid-template-columns: 60px 1fr 1fr;
   padding: 7px 16px;
   border-bottom: 1px solid var(--border);
   font-size: 9px;
@@ -38,8 +76,8 @@
 
 .lap {
   display: grid;
-  grid-template-columns: 64px 1fr 1fr;
-  padding: 9px 16px;
+  grid-template-columns: 60px 1fr 1fr;
+  padding: 8px 16px;
   border-bottom: 1px solid var(--border);
   transition: background 0.1s;
 }
@@ -58,8 +96,9 @@
 
 .lapSplit, .lapTotal {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 15px;
-  letter-spacing: 0.05em;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
   display: flex;
   align-items: center;
 }
@@ -77,4 +116,28 @@
   text-transform: uppercase;
   padding: 2px 5px;
   border-radius: 3px;
+}
+
+@media (max-height: 620px) {
+  .wrapper {
+    padding: 0 20px;
+  }
+
+  .seg {
+    font-size: clamp(48px, 20vh, 96px);
+  }
+
+  .sep {
+    font-size: clamp(32px, 12vh, 62px);
+  }
+
+  .cs {
+    font-size: clamp(24px, 9vh, 42px);
+    padding-bottom: 5px;
+  }
+
+  .lapsWrap {
+    margin-top: 14px;
+    max-height: 120px;
+  }
 }

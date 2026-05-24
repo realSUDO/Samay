@@ -1,6 +1,6 @@
 import styles from './Controls.module.css'
 
-export default function Controls({ running, onPlayPause, onReset, onLap, showLap = true }) {
+export default function Controls({ running, onPlayPause, onReset, onLap, showLap = true, rightAction = null }) {
   return (
     <div className={styles.controls}>
       <button className={`${styles.btn} ${styles.secondary}`} onClick={onReset} aria-label="Reset">
@@ -38,6 +38,15 @@ export default function Controls({ running, onPlayPause, onReset, onLap, showLap
             <circle cx="12" cy="12" r="9" />
             <polyline points="12 7 12 12 15 15" />
           </svg>
+        </button>
+      ) : rightAction ? (
+        <button
+          className={`${styles.btn} ${styles.secondary} ${rightAction.active ? styles.secondaryActive : ''}`}
+          onClick={rightAction.onClick}
+          aria-label={rightAction.ariaLabel}
+          disabled={rightAction.disabled}
+        >
+          {rightAction.icon}
         </button>
       ) : (
         <div className={`${styles.btn} ${styles.secondary} ${styles.ghost}`} aria-hidden="true" />
