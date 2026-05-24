@@ -2,5 +2,79 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+  padding: 0 24px;
+}
+
+/* ── Laps ── */
+.lapsWrap {
+  width: 100%;
+  margin-top: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.lapsHeader {
+  display: grid;
+  grid-template-columns: 64px 1fr 1fr;
+  padding: 7px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+}
+
+.laps { list-style: none; }
+
+.lap {
+  display: grid;
+  grid-template-columns: 64px 1fr 1fr;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.lap:last-child { border-bottom: none; }
+.lap:hover { background: var(--bg-hover); }
+
+.lapNum {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.lapSplit, .lapTotal {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+}
+
+.lapSplit { color: var(--text); }
+.lapTotal { color: var(--text-muted); }
+
+.best  .lapSplit { color: var(--green); }
+.worst .lapSplit { color: var(--red); }
+
+.badge {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  border-radius: 3px;
 }

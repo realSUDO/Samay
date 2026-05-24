@@ -1,35 +1,38 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import TimeDisplay from './TimeDisplay'
 import Controls from './Controls'
 import styles from './Stopwatch.module.css'
 
 function playClick() {
-  const audio = new Audio('/beep.mp3')
-  audio.currentTime = 0
-  audio.play().catch(() => {})
+  const a = new Audio('/beep.mp3')
+  a.currentTime = 0
+  a.play().catch(() => {})
 }
 
-function formatLap(ms) {
-  const totalSeconds = Math.floor(ms / 1000)
-  const h = Math.floor(totalSeconds / 3600)
-  const m = Math.floor((totalSeconds % 3600) / 60)
-  const s = totalSeconds % 60
-  if (h > 0) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+function fmtMs(ms) {
+  const totalCs = Math.floor(ms / 10)
+  const cs = totalCs % 100
+  const totalSec = Math.floor(ms / 1000)
+  const s = totalSec % 60
+  const m = Math.floor(totalSec / 60) % 60
+  const h = Math.floor(totalSec / 3600)
+  const base = h > 0
+    ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+  return `${base}.${String(cs).padStart(2,'0')}`
 }
 
 export default function Stopwatch() {
-  const [elapsed, setElapsed]   = useState(0)
-  const [running, setRunning]   = useState(false)
-  const [laps, setLaps]         = useState([])
+  const [elapsed, setElapsed] = useState(0)
+  const [running, setRunning] = useState(false)
+  const [laps, setLaps] = useState([])
+
   const startRef    = useRef(null)
   const baseRef     = useRef(0)
   const elapsedRef  = useRef(0)
   const intervalRef = useRef(null)
 
-  useEffect(() => {
-    elapsedRef.current = elapsed
-  }, [elapsed])
+  useEffect(() => { elapsedRef.current = elapsed }, [elapsed])
 
   useEffect(() => {
     if (running) {
@@ -38,7 +41,7 @@ export default function Stopwatch() {
         const next = baseRef.current + (Date.now() - startRef.current)
         elapsedRef.current = next
         setElapsed(next)
-      }, 100)
+      }, 30)
     } else {
       clearInterval(intervalRef.current)
       baseRef.current = elapsedRef.current
@@ -63,10 +66,17 @@ export default function Stopwatch() {
     setLaps(prev => [...prev, elapsedRef.current])
   }
 
-  const totalSeconds = Math.floor(elapsed / 1000)
-  const hours        = Math.floor(totalSeconds / 3600)
-  const minutes      = Math.floor((totalSeconds % 3600) / 60)
-  const seconds      = totalSeconds % 60
+  const totalCs  = Math.floor(elapsed / 10)
+  const cs       = totalCs % 100
+  const totalSec = Math.floor(elapsed / 1000)
+  const hours    = Math.floor(totalSec / 3600)
+  const minutes  = Math.floor((totalSec % 3600) / 60)
+  const seconds  = totalSec % 60
+
+  // Lap analysis
+  const lapTimes = laps.map((abs, i) => abs - (laps[i - 1] ?? 0))
+  const bestIdx  = lapTimes.length > 0 ? lapTimes.indexOf(Math.min(...lapTimes)) : -1
+  const worstIdx = lapTimes.length > 1 ? lapTimes.indexOf(Math.max(...lapTimes)) : -1
 
   return (
     <div className={styles.wrapper}>
@@ -74,9 +84,9 @@ export default function Stopwatch() {
         hours={hours}
         minutes={minutes}
         seconds={seconds}
-        centiseconds={0}
+        centiseconds={cs}
         showHours={hours > 0}
-        showCentiseconds={false}
+        showCentiseconds
       />
       <Controls
         running={running}
@@ -86,14 +96,35 @@ export default function Stopwatch() {
         showLap
       />
       {laps.length > 0 && (
-        <ol className={styles.laps} aria-label="Lap times">
-          {laps.map((ms, i) => (
-            <li key={i} className={styles.lap}>
-              <span className={styles.lapNum}>Lap {i + 1}</span>
-              <span className={styles.lapTime}>{formatLap(ms)}</span>
-            </li>
-          ))}
-        </ol>
+        <div className={styles.lapsWrap}>
+          <div className={styles.lapsHeader}>
+            <span>Lap</span>
+            <span>Split</span>
+            <span>Total</span>
+          </div>
+          <ol className={styles.laps} aria-label="Lap times">
+            {[...laps].reverse().map((abs, ri) => {
+              const i = laps.length - 1 - ri
+              const split = lapTimes[i]
+              const isBest  = i === bestIdx
+              const isWorst = i === worstIdx
+              return (
+                <li
+                  key={i}
+                  className={`${styles.lap} ${isBest ? styles.best : ''} ${isWorst ? styles.worst : ''}`}
+                >
+                  <span className={styles.lapNum}>
+                    {isBest  && <span className={styles.badge} style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>best</span>}
+                    {isWorst && <span className={styles.badge} style={{ background: 'var(--red-dim)', color: 'var(--red)' }}>slow</span>}
+                    {i + 1}
+                  </span>
+                  <span className={styles.lapSplit}>{fmtMs(split)}</span>
+                  <span className={styles.lapTotal}>{fmtMs(abs)}</span>
+                </li>
+              )
+            })}
+          </ol>
+        </div>
       )}
     </div>
   )

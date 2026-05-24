@@ -1,108 +1,198 @@
 .shell {
-  display: flex;
-  flex-direction: column;
+  position: relative;
   height: 100vh;
   width: 100vw;
-  background: var(--bg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Header ── */
 .header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 0 40px;
-  height: 64px;
-  flex-shrink: 0;
+  padding: 28px 40px;
+  z-index: 10;
+  pointer-events: none;
 }
 
 .brand {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  letter-spacing: 0.12em;
-  color: var(--text);
+  font-size: 20px;
+  letter-spacing: 0.22em;
+  color: var(--text-muted);
   user-select: none;
-  min-width: 80px;
+  pointer-events: none;
 }
 
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  background: var(--surface);
-  border-radius: 100px;
-  padding: 4px;
-}
-
-.tab {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--text-muted);
-  padding: 7px clamp(12px, 2vw, 20px);
-  border-radius: 100px;
-  transition: color 0.18s ease, background 0.18s ease;
-  white-space: nowrap;
-}
-
-.tab:hover {
-  color: var(--text-secondary);
-  background: var(--hover);
-}
-
-.tabActive {
-  color: var(--text);
-  background: var(--bg);
-  box-shadow: 0 1px 3px rgba(47, 41, 37, 0.08);
-}
-
-.tabActive:hover {
-  background: var(--bg);
-  color: var(--text);
-}
-
-.settingsBtn {
-  color: var(--text-muted);
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: color 0.18s ease, background 0.18s ease;
-  min-width: 80px;
-  justify-content: flex-end;
-}
-
-.settingsBtn:hover {
-  color: var(--text-secondary);
-}
-
-/* ── Main ── */
+/* ── Main content ── */
 .main {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* leave room at bottom for arc nav */
+  padding-bottom: 120px;
+  padding-top: 60px;
+  overflow: hidden;
 }
 
-@media (max-width: 560px) {
-  .header {
-    padding: 0 16px;
+/* ── Arc nav ── */
+/*
+  Imaginary arc circle:
+    center: (50vw, 100vh + 300px)  [below the screen]
+    radius: 400px
+
+  Button positions (angle from positive-X axis):
+    i=0  248°: x = 50vw + 400·cos(248°) = 50vw - 150px
+                y = (100vh+300) + 400·sin(248°) = 100vh+300 - 371px = 100vh - 71px
+    i=1  270°: x = 50vw
+                y = 100vh+300 - 400 = 100vh - 100px
+    i=2  292°: x = 50vw + 150px
+                y = 100vh - 71px
+
+  We position buttons with position:absolute, transform: translate(-50%,-50%)
+  so the button center lands exactly on the arc point.
+*/
+.arcNav {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.arcTrack {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(800px, 100vw);
+  height: 200px;
+  pointer-events: none;
+}
+
+/* All arc buttons share base styles */
+.arcBtn {
+  position: absolute;
+  pointer-events: all;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  transform: translate(-50%, -50%);
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.18s;
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.arcBtn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  transform: translate(-50%, -50%) translateY(-3px);
+}
+
+.arcActive {
+  color: var(--text);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 1px var(--border-mid), 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.arcActive:hover {
+  transform: translate(-50%, -50%) translateY(-3px);
+}
+
+/* Active dot indicator */
+.arcActive::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.arcIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.arcLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* ── Button positions on the arc ── */
+/* i=0: left  — 248° */
+.arcBtn0 {
+  left: calc(50% - 150px);
+  top: calc(100% - 71px);
+}
+
+/* i=1: center — 270° (bottom of arc) */
+.arcBtn1 {
+  left: 50%;
+  top: calc(100% - 100px);
+}
+
+/* i=2: right — 292° */
+.arcBtn2 {
+  left: calc(50% + 150px);
+  top: calc(100% - 71px);
+}
+
+/* ── Mobile: flat bottom bar ── */
+@media (max-width: 600px) {
+  .arcNav {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    pointer-events: all;
   }
 
-  .brand,
-  .settingsBtn {
-    min-width: 44px;
+  .arcTrack { display: none; }
+
+  .arcBtn {
+    position: static;
+    transform: none;
+    flex: 1;
+    border-radius: 0;
+    padding: 8px 4px;
   }
 
-  .brand {
-    font-size: 18px;
+  .arcBtn:hover { transform: none; }
+  .arcActive { box-shadow: none; background: transparent; }
+  .arcActive::after { bottom: -4px; }
+
+  .arcBtn0, .arcBtn1, .arcBtn2 {
+    left: auto;
+    top: auto;
   }
 
-  .tab {
-    font-size: 12px;
+  .main {
+    padding-bottom: 80px;
+    padding-top: 40px;
   }
 }

@@ -7,22 +7,21 @@
 }
 
 .lg {
-  font-size: clamp(80px, 12vw, 160px);
-  width: clamp(60px, 9vw, 120px);
-  height: clamp(80px, 12vw, 160px);
+  font-size: clamp(72px, 11vw, 148px);
+  width: clamp(52px, 8vw, 108px);
+  height: clamp(72px, 11vw, 148px);
 }
 
 .sm {
-  font-size: clamp(40px, 6vw, 80px);
-  width: clamp(30px, 4.5vw, 60px);
-  height: clamp(40px, 6vw, 80px);
+  font-size: clamp(36px, 5.5vw, 72px);
+  width: clamp(26px, 4vw, 54px);
+  height: clamp(36px, 5.5vw, 72px);
 }
 
-/* Centiseconds — roughly half the main digit size, bottom-aligned */
 .cs {
-  font-size: clamp(36px, 5vw, 68px);
-  width: clamp(26px, 3.8vw, 50px);
-  height: clamp(36px, 5vw, 68px);
+  font-size: clamp(32px, 4.5vw, 60px);
+  width: clamp(22px, 3.4vw, 44px);
+  height: clamp(32px, 4.5vw, 60px);
 }
 
 .num {
@@ -30,32 +29,31 @@
   font-size: inherit;
   color: var(--text);
   line-height: 1;
-  text-align: center;
   user-select: none;
   position: absolute;
   width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
 }
 
-/* Outgoing: current digit slides up and fades out */
-.slideOut {
-  animation: slideOut 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+/* Outgoing digit slides up + fades */
+.out {
+  animation: slideOut 0.14s cubic-bezier(0.3, 0, 0.7, 1) forwards;
 }
 
-/* Incoming: new digit slides up from below */
-.slideIn {
-  animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+/* Incoming digit slides up from below */
+.in {
+  animation: slideIn 0.16s cubic-bezier(0.3, 0, 0.7, 1) forwards;
 }
 
 @keyframes slideOut {
-  0%   { transform: translateY(0%);    opacity: 1; }
-  100% { transform: translateY(-100%); opacity: 0; }
+  from { transform: translateY(0);     opacity: 1; }
+  to   { transform: translateY(-55%);  opacity: 0; }
 }
 
 @keyframes slideIn {
-  0%   { transform: translateY(100%);  opacity: 0; }
-  100% { transform: translateY(0%);    opacity: 1; }
+  from { transform: translateY(55%);   opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
 }

@@ -1,10 +1,8 @@
 .display {
   display: flex;
   align-items: flex-end;
-  gap: 0;
 }
 
-/* ── Main digit group (HH, MM, SS) ── */
 .group {
   display: flex;
   flex-direction: column;
@@ -14,65 +12,47 @@
 
 .digits {
   display: flex;
-  gap: clamp(2px, 0.3vw, 6px);
+  gap: clamp(1px, 0.2vw, 4px);
 }
 
 .label {
   font-family: 'Inter', sans-serif;
-  font-size: clamp(9px, 0.85vw, 12px);
-  font-weight: 400;
+  font-size: clamp(8px, 0.7vw, 10px);
+  font-weight: 600;
   letter-spacing: 0.2em;
   color: var(--text-muted);
   text-transform: uppercase;
-  height: 16px;
+  height: 12px;
   display: flex;
   align-items: center;
 }
 
-/* ── Colon separator ── */
-.colonWrap {
-  /* sits between digit groups, nudged up to clear the label row */
-  padding-bottom: clamp(22px, 2.8vw, 38px);
-  padding-left: clamp(4px, 0.5vw, 10px);
-  padding-right: clamp(4px, 0.5vw, 10px);
+.sep {
+  padding-bottom: clamp(18px, 2.4vw, 32px);
+  padding-inline: clamp(2px, 0.35vw, 7px);
   display: flex;
   align-items: flex-end;
 }
 
 .colon {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(48px, 7vw, 96px);
+  font-size: clamp(44px, 6.5vw, 88px);
   color: var(--text-muted);
   line-height: 1;
-  opacity: 0.3;
+  opacity: 0.35;
   user-select: none;
 }
 
-/* ── Centiseconds suffix (stopwatch only) ── */
 .csGroup {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  /* align bottom with the main digit groups */
-  margin-left: clamp(6px, 0.8vw, 14px);
+  margin-left: clamp(4px, 0.5vw, 8px);
 }
 
 .csDigits {
   display: flex;
-  gap: clamp(1px, 0.2vw, 4px);
-  /* sit at the bottom of the main digit height */
+  gap: clamp(1px, 0.15vw, 3px);
   align-self: flex-end;
-}
-
-.csLabel {
-  font-family: 'Inter', sans-serif;
-  font-size: clamp(9px, 0.85vw, 12px);
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  height: 16px;
-  display: flex;
-  align-items: center;
 }

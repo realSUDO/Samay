@@ -5,17 +5,32 @@
 }
 
 :root {
-  --bg: #F8E7C6;
-  --surface: #F4E2BF;
-  --hover: #EED8B0;
-  --text: #2F2925;
-  --text-secondary: #6E6258;
-  --text-muted: #A99A8A;
-  --accent: #A86A3D;
-  --accent-hover: #8E572E;
-  --accent-active: #C57C42;
-  --btn-primary: #2F2925;
-  --btn-primary-text: #F8E7C6;
+  --bg:            #0a0a0b;
+  --bg-elevated:   #111113;
+  --bg-hover:      #18181b;
+  --bg-active:     #1f1f23;
+  --bg-card:       #131316;
+
+  --border:        rgba(255,255,255,0.055);
+  --border-mid:    rgba(255,255,255,0.09);
+  --border-focus:  rgba(255,255,255,0.18);
+
+  --text:          #f0f0f0;
+  --text-secondary:#7a7a7a;
+  --text-muted:    #3a3a3a;
+
+  --accent:        #7c6af7;
+  --accent-hover:  #6a59e8;
+  --accent-dim:    rgba(124,106,247,0.10);
+  --accent-glow:   rgba(124,106,247,0.28);
+
+  --green:         #34d399;
+  --green-dim:     rgba(52,211,153,0.09);
+  --red:           #f87171;
+  --red-dim:       rgba(248,113,113,0.09);
+
+  --btn-bg:        #f0f0f0;
+  --btn-text:      #0a0a0b;
 }
 
 html, body {
@@ -25,26 +40,39 @@ html, body {
 }
 
 body {
-  background-color: var(--bg);
+  background: var(--bg);
   color: var(--text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#root {
-  height: 100%;
-  width: 100%;
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
 }
+
+#root { height: 100%; width: 100%; }
 
 button {
   cursor: pointer;
   border: none;
   background: none;
   font-family: inherit;
+  color: inherit;
 }
 
 button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 3px; }

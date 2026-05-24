@@ -2,62 +2,115 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* ── Presets ── */
+.presets {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
   justify-content: center;
 }
 
-.displayButton {
-  display: block;
-  transition: opacity 0.2s ease;
-}
-
-.displayButton:disabled {
-  cursor: default;
-}
-
-.clickable {
-  cursor: pointer;
-}
-
-.clickable:hover {
-  opacity: 0.8;
-}
-
-.finished {
-  opacity: 0.35;
-}
-
-.hint {
-  margin-top: 20px;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-.finishedMsg {
-  margin-top: 16px;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+.preset {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent);
-  text-align: center;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 5px 14px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 
-/* ── Input ── */
-.inputWrap {
+.preset:hover {
+  color: var(--text-secondary);
+  border-color: var(--border-mid);
+}
+
+.presetActive {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.presetActive:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── Ring ── */
+.ringWrap {
+  position: relative;
+  width: 360px;
+  height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ── Time inside ring ── */
+.displayBtn {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  gap: 6px;
+  transition: opacity 0.2s;
+  max-width: 280px;
+}
+
+.displayBtn:disabled { cursor: default; }
+.clickable:hover .ringTime { opacity: 0.65; }
+.finished .ringTime { opacity: 0.3; }
+
+.ringTime {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 8vw, 88px);
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  user-select: none;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.ringHint {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Input inside ring ── */
+.inputWrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 260px;
 }
 
 .input {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(72px, 11vw, 160px);
+  font-size: clamp(56px, 8vw, 88px);
   color: var(--text);
   background: transparent;
   border: none;
@@ -65,76 +118,69 @@
   outline: none;
   text-align: center;
   letter-spacing: 0.05em;
-  width: clamp(280px, 40vw, 600px);
+  width: 220px;
   caret-color: var(--accent);
-  padding-bottom: 8px;
+  padding-bottom: 4px;
 }
 
-.input[aria-invalid="true"] {
-  border-bottom-color: #b64235;
-}
+.inputErr { border-bottom-color: var(--red); }
 
-.input::selection {
-  background: rgba(168, 106, 61, 0.2);
-}
-
-.inputHint,
-.inputError {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.06em;
+.errMsg {
+  font-size: 10px;
+  color: var(--red);
   text-align: center;
-  min-height: 16px;
+  letter-spacing: 0.04em;
 }
 
-.inputHint {
-  color: var(--text-muted);
-}
+.inputActions { display: flex; gap: 8px; }
 
-.inputError {
-  color: #b64235;
-}
-
-.inputActions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-.primaryButton,
-.secondaryButton {
-  min-width: 76px;
-  height: 40px;
+.setBtn, .cancelBtn {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   border-radius: 100px;
-  padding: 0 18px;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+  padding: 5px 16px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.primaryButton {
-  background: var(--btn-primary);
-  color: var(--btn-primary-text);
+.setBtn {
+  background: var(--btn-bg);
+  color: var(--btn-text);
 }
 
-.primaryButton:hover {
-  background: #3d3530;
+.setBtn:hover { background: #d4d4d4; }
+
+.cancelBtn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-mid);
 }
 
-.secondaryButton {
-  background: var(--surface);
+.cancelBtn:hover {
   color: var(--text-secondary);
+  border-color: var(--border-focus);
 }
 
-.secondaryButton:hover {
-  background: var(--hover);
-  color: var(--text);
+/* ── Status ── */
+.finishedMsg {
+  margin-top: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--red);
 }
 
-.primaryButton:active,
-.secondaryButton:active {
-  transform: scale(0.96);
+.hint {
+  margin-top: 10px;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 480px) {
+  .ringWrap { width: 290px; height: 290px; }
+  .ringTime, .input { font-size: 52px; }
+  .input { width: 180px; }
 }
