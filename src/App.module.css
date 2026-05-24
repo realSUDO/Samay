@@ -7,14 +7,9 @@
   flex-direction: column;
 }
 
-/* ── Header ── */
 .header {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
+  top: 0; left: 0; right: 0;
   padding: 28px 40px;
   z-index: 10;
   pointer-events: none;
@@ -22,60 +17,73 @@
 
 .brand {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
-  letter-spacing: 0.22em;
+  font-size: 17px;
+  letter-spacing: 0.28em;
   color: var(--text-muted);
   user-select: none;
-  pointer-events: none;
 }
 
-/* ── Main content ── */
 .main {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* leave room at bottom for arc nav */
-  padding-bottom: 120px;
-  padding-top: 60px;
+  padding-bottom: 140px;
+  padding-top: 64px;
   overflow: hidden;
 }
 
-/* ── Arc nav ── */
-/*
-  Imaginary arc circle:
-    center: (50vw, 100vh + 300px)  [below the screen]
-    radius: 400px
-
-  Button positions (angle from positive-X axis):
-    i=0  248°: x = 50vw + 400·cos(248°) = 50vw - 150px
-                y = (100vh+300) + 400·sin(248°) = 100vh+300 - 371px = 100vh - 71px
-    i=1  270°: x = 50vw
-                y = 100vh+300 - 400 = 100vh - 100px
-    i=2  292°: x = 50vw + 150px
-                y = 100vh - 71px
-
-  We position buttons with position:absolute, transform: translate(-50%,-50%)
-  so the button center lands exactly on the arc point.
-*/
-.arcNav {
+/* ── Drag zone — bottom arc area ── */
+.arcZone {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 20;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 160px;
+  z-index: 25;
+  cursor: grab;
+  touch-action: none;
 }
 
+.dragging { cursor: grabbing; }
+
+.arcZone::after {
+  content: '← drag →';
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Decorative arc SVG ── */
 .arcTrack {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: min(800px, 100vw);
+  width: min(900px, 100vw);
   height: 200px;
   pointer-events: none;
+  z-index: 20;
 }
 
-/* All arc buttons share base styles */
+/* ── Arc nav ── */
+.arcNav {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* ── Arc buttons ── */
 .arcBtn {
   position: absolute;
   pointer-events: all;
@@ -83,116 +91,68 @@
   flex-direction: column;
   align-items: center;
   gap: 5px;
-  padding: 10px 14px;
+  padding: 10px 18px;
   border-radius: 14px;
   transform: translate(-50%, -50%);
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.18s;
+  transition:
+    left 0.4s cubic-bezier(0.34, 1.4, 0.64, 1),
+    top  0.4s cubic-bezier(0.34, 1.4, 0.64, 1),
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
   color: var(--text-muted);
   background: transparent;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
 
-.arcBtn:hover {
-  color: var(--text-secondary);
-  background: var(--bg-elevated);
-  transform: translate(-50%, -50%) translateY(-3px);
+/* 1:1 during drag — kill position transition */
+.arcDragging {
+  transition:
+    background 0.1s,
+    color 0.1s !important;
 }
+
+.arcBtn:hover { color: var(--text-secondary); }
 
 .arcActive {
   color: var(--text);
-  background: var(--bg-elevated);
-  box-shadow: 0 0 0 1px var(--border-mid), 0 4px 20px rgba(0,0,0,0.4);
+  background: rgba(255,255,255,0.045);
+  box-shadow: 0 0 0 1px var(--border-mid), 0 6px 28px rgba(0,0,0,0.5);
 }
 
-.arcActive:hover {
-  transform: translate(-50%, -50%) translateY(-3px);
-}
-
-/* Active dot indicator */
 .arcActive::after {
   content: '';
   position: absolute;
-  bottom: -8px;
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
   width: 4px;
   height: 4px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 8px var(--accent-glow);
+  box-shadow: 0 0 12px var(--accent-glow), 0 0 24px var(--accent-glow);
 }
 
 .arcIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
+  pointer-events: none;
 }
 
 .arcLabel {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
-/* ── Button positions on the arc ── */
-/* i=0: left  — 248° */
-.arcBtn0 {
-  left: calc(50% - 150px);
-  top: calc(100% - 71px);
-}
-
-/* i=1: center — 270° (bottom of arc) */
-.arcBtn1 {
-  left: 50%;
-  top: calc(100% - 100px);
-}
-
-/* i=2: right — 292° */
-.arcBtn2 {
-  left: calc(50% + 150px);
-  top: calc(100% - 71px);
-}
-
-/* ── Mobile: flat bottom bar ── */
 @media (max-width: 600px) {
-  .arcNav {
-    position: fixed;
-    top: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background: var(--bg-elevated);
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    pointer-events: all;
-  }
-
-  .arcTrack { display: none; }
-
-  .arcBtn {
-    position: static;
-    transform: none;
-    flex: 1;
-    border-radius: 0;
-    padding: 8px 4px;
-  }
-
-  .arcBtn:hover { transform: none; }
-  .arcActive { box-shadow: none; background: transparent; }
-  .arcActive::after { bottom: -4px; }
-
-  .arcBtn0, .arcBtn1, .arcBtn2 {
-    left: auto;
-    top: auto;
-  }
-
-  .main {
-    padding-bottom: 80px;
-    padding-top: 40px;
-  }
+  .main { padding-bottom: 110px; padding-top: 48px; }
 }
