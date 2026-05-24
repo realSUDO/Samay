@@ -1,0 +1,140 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.displayButton {
+  display: block;
+  transition: opacity 0.2s ease;
+}
+
+.displayButton:disabled {
+  cursor: default;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  opacity: 0.8;
+}
+
+.finished {
+  opacity: 0.35;
+}
+
+.hint {
+  margin-top: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.finishedMsg {
+  margin-top: 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-align: center;
+}
+
+/* ── Input ── */
+.inputWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.input {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 11vw, 160px);
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--accent);
+  outline: none;
+  text-align: center;
+  letter-spacing: 0.05em;
+  width: clamp(280px, 40vw, 600px);
+  caret-color: var(--accent);
+  padding-bottom: 8px;
+}
+
+.input[aria-invalid="true"] {
+  border-bottom-color: #b64235;
+}
+
+.input::selection {
+  background: rgba(168, 106, 61, 0.2);
+}
+
+.inputHint,
+.inputError {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-align: center;
+  min-height: 16px;
+}
+
+.inputHint {
+  color: var(--text-muted);
+}
+
+.inputError {
+  color: #b64235;
+}
+
+.inputActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.primaryButton,
+.secondaryButton {
+  min-width: 76px;
+  height: 40px;
+  border-radius: 100px;
+  padding: 0 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+
+.primaryButton {
+  background: var(--btn-primary);
+  color: var(--btn-primary-text);
+}
+
+.primaryButton:hover {
+  background: #3d3530;
+}
+
+.secondaryButton {
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+
+.secondaryButton:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.primaryButton:active,
+.secondaryButton:active {
+  transform: scale(0.96);
+}

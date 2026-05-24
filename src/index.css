@@ -1,0 +1,50 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #F8E7C6;
+  --surface: #F4E2BF;
+  --hover: #EED8B0;
+  --text: #2F2925;
+  --text-secondary: #6E6258;
+  --text-muted: #A99A8A;
+  --accent: #A86A3D;
+  --accent-hover: #8E572E;
+  --accent-active: #C57C42;
+  --btn-primary: #2F2925;
+  --btn-primary-text: #F8E7C6;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
